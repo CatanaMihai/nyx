@@ -1,10 +1,10 @@
 # Roadmap
 
-Phase 1 shipped a polished, reliable app launcher. Phase 2 (this build) added
-full visual theming (see [THEMING.md](THEMING.md)) — a `ThemeService`, 5
-built-in presets, a live-editable Custom theme, and a Settings window with a
-live preview. Everything below is deliberately deferred so each phase stays
-focused and solid.
+Nyx ships a fuzzy app launcher and a full visual theming system today (see
+[THEMING.md](THEMING.md)) — a `ThemeService`, built-in presets, a
+live-editable Custom theme, and a Settings window with a live preview.
+Everything below is future work, kept deliberately out of scope for now so
+the core stays focused and solid.
 
 The architecture is already set up for this: each item below is a new
 `ISearchProvider` implementation registered in `App.xaml.cs`
@@ -13,7 +13,7 @@ own `Services/` class for the non-search side effects (executing a command,
 switching an audio device, etc.). No changes to `SearchEngine`, `MainViewModel`,
 or the window/animation code should be required to add any of these.
 
-## Phase 2 candidates
+## Ideas / candidates
 
 - **File search** — a provider indexing (or querying, via the Windows Search
   index / `IFileSearch`) file system paths, with its own ranking tuned for

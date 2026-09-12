@@ -667,8 +667,8 @@
                                     <StackPanel>
                                         <TextBlock Text="Nyx" Foreground="{DynamicResource ThemePrimaryTextBrush}" FontSize="16" FontWeight="SemiBold"/>
                                         <TextBlock Text="A fast, keyboard-first application launcher for Windows." Style="{StaticResource FieldLabel}" Margin="0,6,0,0"/>
-                                        <TextBlock Text="Settings: %AppData%\Launcher\settings.json" Style="{StaticResource FieldLabel}" Margin="0,14,0,0" Opacity="0.7"/>
-                                        <TextBlock Text="Themes: %AppData%\Launcher\Themes\" Style="{StaticResource FieldLabel}" Opacity="0.7"/>
+                                        <TextBlock Text="Settings: %AppData%\Nyx\settings.json" Style="{StaticResource FieldLabel}" Margin="0,14,0,0" Opacity="0.7"/>
+                                        <TextBlock Text="Themes: %AppData%\Nyx\Themes\" Style="{StaticResource FieldLabel}" Opacity="0.7"/>
                                     </StackPanel>
                                 </Border>
                             </StackPanel>

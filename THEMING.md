@@ -1,6 +1,6 @@
 # Theming
 
-Launcher's entire visual appearance — colors, sizes, glow, fonts, animation
+Nyx's entire visual appearance — colors, sizes, glow, fonts, animation
 timing — is data-driven. Nothing about how it looks is hard-coded in XAML;
 everything is resolved at runtime from a `ThemeDefinition` and pushed into
 WPF's resource dictionary, so changing a theme is instant and never requires
@@ -12,7 +12,7 @@ restarting the app.
 /Themes
     ThemeDefinition.cs   — plain data model: every themeable property (also the on-disk JSON schema)
     ThemeService.cs      — loads/applies/saves themes; the only place that touches Application.Resources
-    BuiltInThemes.cs     — the 5 shipped presets (Midnight Cyan, Obsidian, Nord, Dracula, Light)
+    BuiltInThemes.cs     — the shipped presets (Midnight Cyan, Obsidian, Nord, Dracula, Light, Cyberpunk)
 ```
 
 **Flow:**
@@ -159,20 +159,21 @@ Custom theme").
 Themes are plain JSON, stored at:
 
 ```
-%AppData%\Launcher\Themes\
+%AppData%\Nyx\Themes\
     Midnight Cyan.json
     Obsidian.json
     Nord.json
     Dracula.json
     Light.json
+    Cyberpunk.json
     Custom.json          (created the first time you click "Save")
 ```
 
-The five built-in presets are written out here automatically the first time
-the app runs (if not already present), so they're always available for
-hand-editing or copying as a starting point for your own theme — this phase
-doesn't require editing them by hand, but the architecture already supports
-it: any well-formed `ThemeDefinition` JSON file dropped into that folder is
+The built-in presets are written out here automatically the first time the
+app runs (if not already present), so they're always available for
+hand-editing or copying as a starting point for your own theme. You don't
+need to edit them by hand, but the architecture supports it: any well-formed
+`ThemeDefinition` JSON file dropped into that folder is
 picked up (matched to the launcher by its `"Name"` field) the next time
 Settings' theme dropdown is opened.
 
@@ -200,8 +201,7 @@ Example (`My Purple Theme.json`):
 If `settings.json` or a theme file is missing, malformed, or contains an
 invalid color:
 
-- The bad file/value is logged (`%AppData%\Launcher\launcher.log`) and
-  ignored.
+- The bad file/value is logged (`%AppData%\Nyx\nyx.log`) and ignored.
 - `ThemeService` falls back to the compiled-in **Midnight Cyan** definition
   — never to a half-applied or null theme.
 - The launcher always starts. A corrupt theme file can never prevent the
@@ -209,7 +209,7 @@ invalid color:
 
 ## Known limitations
 
-- The 5 built-in presets are seeded as files on first run but are not
+- The built-in presets are seeded as files on first run but are not
   currently protected from being overwritten if you save a custom theme
   using the exact same name as a built-in (e.g. naming a custom theme
   "Nord.json" some other way) — in practice this only happens if you hand-edit

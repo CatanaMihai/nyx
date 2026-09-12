@@ -2,7 +2,7 @@ using System.Windows.Input;
 
 namespace Launcher.ViewModels;
 
-/// <summary>Minimal ICommand implementation; avoids pulling in a full MVVM framework for Phase 1.</summary>
+/// <summary>Minimal ICommand implementation; avoids pulling in a full MVVM framework.</summary>
 public sealed class RelayCommand : ICommand
 {
     private readonly Action<object?> _execute;

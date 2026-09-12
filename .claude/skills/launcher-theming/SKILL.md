@@ -20,7 +20,7 @@ of all three:
 1. **`Themes/ThemeDefinition.cs`** — a plain C# class with every themeable
    property (colors as hex strings, sizes as doubles, a couple of string
    "enum" fields like `AmbientAnimationStyle`). This is also the JSON schema
-   for on-disk theme files (`%AppData%\Launcher\Themes\*.json`) — it's
+   for on-disk theme files (`%AppData%\Nyx\Themes\*.json`) — it's
    `System.Text.Json`-serialized directly, no custom converters.
 2. **`Themes/ThemeService.cs`** — the *only* code allowed to write into
    `Application.Current.Resources`. `PushToResources(ThemeDefinition t)` is
@@ -91,7 +91,7 @@ touch for a plain color-scheme preset:
 4. Add `FooName => Foo(),` to the `FindByName` switch.
 
 That's it — `ThemeService.EnsureThemesDirectoryHasBuiltIns()` automatically
-seeds `Foo.json` in `%AppData%\Launcher\Themes\` on next startup, and
+seeds `Foo.json` in `%AppData%\Nyx\Themes\` on next startup, and
 `SettingsViewModel.AvailableThemes` (built from `BuiltInThemes.All`) picks it
 up in the dropdown automatically. No changes needed in `ThemeService`,
 `SettingsViewModel`, or any XAML.
@@ -275,11 +275,11 @@ occur, but relevant if you add new code files):
   pattern from the top of `Views/SettingsWindow.xaml.cs` or
   `Views/ColorPickerPopup.xaml.cs`.
 - If `dotnet build` fails with `MSB3027`/file-locked errors, a previous
-  `Launcher.exe` is still running — `Stop-Process -Name Launcher -Force`
+  `Nyx.exe` is still running — `Stop-Process -Name Nyx -Force`
   first (PowerShell) before rebuilding.
 - To smoke-test a theme/animation change without touching the running
   desktop's other apps: write
-  `%AppData%\Launcher\settings.json` directly with
+  `%AppData%\Nyx\settings.json` directly with
   `"CurrentThemeName": "YourPreset"` and start the exe — this loads and
   applies the theme with **zero keyboard/mouse input needed**, so it's the
   safest way to verify a preset applies and the app doesn't crash. Only send
@@ -287,5 +287,5 @@ occur, but relevant if you add new code files):
   (screenshot), and be aware those key/mouse events go to whatever the OS
   foreground window actually is on a shared/real desktop, not necessarily
   the launcher — verify with `GetForegroundWindow`/`GetWindowThreadProcessId`
-  or just check `%AppData%\Launcher\launcher.log` and the process exit code
+  or just check `%AppData%\Nyx\nyx.log` and the process exit code
   first before assuming a synthetic key reached the app.

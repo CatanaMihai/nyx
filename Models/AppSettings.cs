@@ -2,7 +2,7 @@ namespace Launcher.Models;
 
 /// <summary>
 /// Functional (non-visual) configuration for the launcher. Persisted as JSON
-/// under %AppData%\Launcher\settings.json. Visual/appearance configuration
+/// under %AppData%\Nyx\settings.json. Visual/appearance configuration
 /// lives separately in <see cref="Launcher.Themes.ThemeDefinition"/> — see
 /// <see cref="Launcher.Themes.ThemeService"/> — and is referenced here only
 /// by name via <see cref="CurrentThemeName"/>.

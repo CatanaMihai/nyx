@@ -3,11 +3,11 @@ using Launcher.Models;
 namespace Launcher.Search;
 
 /// <summary>
-/// A pluggable source of search results. Phase 1 ships only
-/// <see cref="AppSearchProvider"/>, but the SearchEngine fans queries out to
-/// every registered provider so future providers (files, calculator, web
-/// search, commands, volume, clipboard, timers, ...) can be added without
-/// touching existing code.
+/// A pluggable source of search results. Only <see cref="AppSearchProvider"/>
+/// ships today, but the SearchEngine fans queries out to every registered
+/// provider so future providers (files, calculator, web search, commands,
+/// volume, clipboard, timers, ...) can be added without touching existing
+/// code.
 /// </summary>
 public interface ISearchProvider
 {

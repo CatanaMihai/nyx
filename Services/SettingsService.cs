@@ -5,7 +5,7 @@ using Launcher.Models;
 namespace Launcher.Services;
 
 /// <summary>
-/// Loads and saves <see cref="AppSettings"/> from %AppData%\Launcher\settings.json.
+/// Loads and saves <see cref="AppSettings"/> from %AppData%\Nyx\settings.json.
 /// Falls back to defaults if the file is missing or corrupt.
 /// </summary>
 public sealed class SettingsService

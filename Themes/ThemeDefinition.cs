@@ -3,7 +3,7 @@ namespace Launcher.Themes;
 /// <summary>
 /// Every visual property the launcher's UI can be styled with. Fully
 /// serializable to/from JSON so it doubles as the on-disk theme-file schema
-/// (%AppData%\Launcher\Themes\*.json) and the in-memory value ThemeService
+/// (%AppData%\Nyx\Themes\*.json) and the in-memory value ThemeService
 /// applies to the WPF resource dictionary. Colors are stored as hex strings
 /// ("#RRGGBB" or "#AARRGGBB") so they round-trip cleanly through JSON and are
 /// easy for a settings UI (or, later, a hand-edited file) to work with.
