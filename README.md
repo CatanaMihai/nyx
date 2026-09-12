@@ -63,6 +63,20 @@ ISCC.exe installer/Nyx.iss
 
 This publishes a self-contained `win-x64` build and packages it into `installer/output/NyxSetup.exe`.
 
+## Building your own themes & animations
+
+Beyond the built-in presets and custom color picker, this repo ships a
+[Claude Code](https://claude.com/claude-code) skill —
+[`.claude/skills/launcher-theming/SKILL.md`](.claude/skills/launcher-theming/SKILL.md) —
+that teaches Claude exactly how Nyx's theming system works (the
+`ThemeDefinition`/`ThemeService` architecture, the JSON theme-file format, and
+how ambient animations like Pulse/Shimmer/Glitch are implemented). If you have
+Claude Code and a local clone of this repo, just ask it to build a new theme
+preset or animation pattern for you (e.g. "add a Solarized theme" or "add a
+new ambient animation called Breathe") and it'll follow this project's
+conventions automatically — no need to read the theming internals yourself.
+See [THEMING.md](THEMING.md) for the theme-file format if you'd rather hand-edit one.
+
 ## Project structure
 
 ```
