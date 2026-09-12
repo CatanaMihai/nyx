@@ -15,20 +15,41 @@ public sealed class AppDiscoveryService
     {
         var results = new List<SearchResult>();
         var seenKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var seenTitles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var dir in GetStartMenuDirectories())
         {
             foreach (var result in ScanDirectory(dir))
             {
                 if (seenKeys.Add(result.DedupeKey))
+                {
                     results.Add(result);
+                    seenTitles.Add(result.Title);
+                }
             }
         }
 
         foreach (var result in ScanPackagedApps())
         {
+            // ScanPackagedApps already skips AppsFolder entries with a real
+            // filesystem path (those are desktop apps and get caught by the
+            // DedupeKey check below like anything else). But some Win32 apps
+            // (e.g. VS Code) register an AppUserModelID purely for taskbar/
+            // jump-list grouping with no literal path in AppsFolder, so they
+            // still look like a "packaged app" there even though the exact
+            // same app was already found via its Start Menu shortcut - under
+            // a different DedupeKey, so that check alone doesn't catch it.
+            // Falling back to an exact display-name match catches this too,
+            // keeping whichever copy was found first (the Start Menu one,
+            // which usually has a better icon/subtitle).
+            if (seenTitles.Contains(result.Title))
+                continue;
+
             if (seenKeys.Add(result.DedupeKey))
+            {
                 results.Add(result);
+                seenTitles.Add(result.Title);
+            }
         }
 
         return results;

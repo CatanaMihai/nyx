@@ -127,10 +127,11 @@ public sealed class HotkeyService : IDisposable
         if (msg == WM_HOTKEY)
         {
             var id = wParam.ToInt32();
-            foreach (var entry in _entries.Values)
+            foreach (var (name, entry) in _entries)
             {
                 if (entry.Id == id)
                 {
+                    LogService.Info($"Global hotkey '{name}' ({entry.Shortcut}) fired.");
                     entry.Callback();
                     handled = true;
                     break;

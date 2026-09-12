@@ -163,6 +163,53 @@
             </Setter>
         </Style>
 
+        <!-- Themed scrollbar: thin, rounded, translucent track + accent thumb.
+             No x:Key -> applies implicitly to EVERY ScrollBar in this window,
+             including the ones inside ComboBox dropdown popups (Popup content
+             stays in this window's logical tree for resource lookup), so the
+             settings body scrollbar and every dropdown's scrollbar match. -->
+        <Style TargetType="ScrollBar">
+            <Setter Property="Width" Value="10"/>
+            <Setter Property="MinWidth" Value="10"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="Transparent" Margin="2,4">
+                            <Track x:Name="PART_Track" IsDirectionReversed="True" Width="6" HorizontalAlignment="Center">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.PageUpCommand" Opacity="0" Focusable="False"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.PageDownCommand" Opacity="0" Focusable="False"/>
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb x:Name="Thumb">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border x:Name="ThumbBorder" CornerRadius="3"
+                                                        Background="{DynamicResource ThemeSecondaryTextBrush}" Opacity="0.35"/>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource ThemeAccentBrush}"/>
+                                                        <Setter TargetName="ThumbBorder" Property="Opacity" Value="0.55"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsDragging" Value="True">
+                                                        <Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource ThemeAccentBrush}"/>
+                                                        <Setter TargetName="ThumbBorder" Property="Opacity" Value="0.8"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- Dark combo box -->
         <Style x:Key="ThemedComboBox" TargetType="ComboBox">
             <Setter Property="Background" Value="#14FFFFFF"/>
@@ -174,11 +221,14 @@
                     <ControlTemplate TargetType="ComboBox">
                         <Grid>
                             <ToggleButton x:Name="Toggle" Focusable="False"
+                                          Background="{TemplateBinding Background}"
+                                          Foreground="{TemplateBinding Foreground}"
+                                          Padding="{TemplateBinding Padding}"
                                           IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
                                           ClickMode="Press">
                                 <ToggleButton.Template>
                                     <ControlTemplate TargetType="ToggleButton">
-                                        <Border CornerRadius="9" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                        <Border x:Name="ToggleBorder" CornerRadius="9" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*"/>
@@ -186,13 +236,26 @@
                                                 </Grid.ColumnDefinitions>
                                                 <ContentPresenter Grid.Column="0" Content="{Binding SelectionBoxItem, RelativeSource={RelativeSource AncestorType=ComboBox}}"
                                                                   VerticalAlignment="Center"/>
-                                                <TextBlock Grid.Column="1" Text="▾" Foreground="{DynamicResource ThemeSecondaryTextBrush}"
+                                                <TextBlock x:Name="Arrow" Grid.Column="1" Text="▾" Foreground="{DynamicResource ThemeSecondaryTextBrush}"
                                                            VerticalAlignment="Center" Margin="8,0,2,0"/>
                                             </Grid>
                                         </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="ToggleBorder" Property="Background" Value="#20FFFFFF"/>
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="ToggleBorder" Property="Background" Value="#20FFFFFF"/>
+                                                <Setter TargetName="Arrow" Property="Foreground" Value="{DynamicResource ThemeAccentBrush}"/>
+                                                <Setter TargetName="Arrow" Property="RenderTransform">
+                                                    <Setter.Value>
+                                                        <ScaleTransform ScaleY="-1" CenterY="5"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
                                     </ControlTemplate>
                                 </ToggleButton.Template>
-                                <Border Background="{TemplateBinding Background}"/>
                             </ToggleButton>
                             <Popup x:Name="Popup" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Placement="Bottom" PopupAnimation="Fade">
                                 <Border CornerRadius="9" Background="{DynamicResource ThemeWindowBackgroundBrush}"

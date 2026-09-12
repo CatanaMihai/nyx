@@ -57,6 +57,13 @@ public partial class App : System.Windows.Application
         _mainWindow = new MainWindow(viewModel, _settingsService.Current, _themeService);
         viewModel.RequestClose += () => _mainWindow?.AnimateHide();
 
+        // Do the window's one-time, heavier-than-usual first show (Win32
+        // handle creation, style/template realization, first layout pass) now
+        // instead of on the user's first real Ctrl+Space - see WarmUp()'s
+        // doc comment for why that first show otherwise behaved differently
+        // from every later one.
+        _mainWindow.WarmUp();
+
         SetupTrayIcon();
 
         _hotkeyService = new HotkeyService();

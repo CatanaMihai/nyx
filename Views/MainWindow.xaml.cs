@@ -1,5 +1,7 @@
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Launcher.Models;
@@ -20,6 +22,12 @@ namespace Launcher.Views;
 /// </summary>
 public partial class MainWindow : Window
 {
+    [DllImport("user32.dll")] private static extern IntPtr GetForegroundWindow();
+    [DllImport("user32.dll")] private static extern bool SetForegroundWindow(IntPtr hWnd);
+    [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr hWnd, IntPtr lpdwProcessId);
+    [DllImport("user32.dll")] private static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+    [DllImport("kernel32.dll")] private static extern uint GetCurrentThreadId();
+
     private readonly MainViewModel _viewModel;
     private readonly AppSettings _settings;
     private readonly ThemeService _themeService;
@@ -67,6 +75,95 @@ public partial class MainWindow : Window
         PreviewKeyDown += OnPreviewKeyDown;
         Deactivated += (_, _) => AnimateHide();
         ResultsList.MouseUp += (_, _) => _viewModel.LaunchSelectedCommand.Execute(null);
+
+        // On a cold start, calling Keyboard.Focus(SearchBox) synchronously right
+        // after Visibility=Visible can lose the race: the very first show does
+        // more work under the hood than every later one - the window's own
+        // Loaded event, first-time style/template realization, and the first
+        // real layout/render pass all fire for the first time and are queued
+        // at Loaded/Render/Normal dispatcher priority, all of which run BEFORE
+        // DispatcherPriority.Input. So a focus request queued at Input can
+        // still lose to that first-time churn even though it never competes
+        // with anything on later opens. ContextIdle is lower than all of
+        // those, so this reliably runs dead last, after everything the first
+        // show does - re-asserted on every Activated (fires every AnimateShow,
+        // not just the first) so it's a no-op safety net on later opens.
+        Activated += (_, _) => Dispatcher.BeginInvoke(new Action(() =>
+        {
+            SearchBox.Focus();
+            Keyboard.Focus(SearchBox);
+        }), DispatcherPriority.ContextIdle);
+    }
+
+    /// <summary>
+    /// Forces this window's Win32 handle, styles/templates, and first layout
+    /// pass to be created right now, invisibly, instead of lazily on the first
+    /// real AnimateShow. WPF only does that heavier one-time setup the very
+    /// first time a window's Visibility becomes Visible - showing it for real
+    /// on the very first user-triggered Ctrl+Space made that first show behave
+    /// differently from every later one (wrong monitor/position, and
+    /// intermittently no real keyboard focus even though later opens were
+    /// always fine). Calling this once at startup, before the user can ever
+    /// press the hotkey, makes the first real show already "warm".
+    /// </summary>
+    public void WarmUp()
+    {
+        // Park it far off-screen so nothing is visible even for a frame -
+        // Opacity is already 0 by default (see XAML) but this is a second,
+        // independent guarantee that isn't relying on that.
+        Left = -32000;
+        Top = -32000;
+        Visibility = Visibility.Visible;
+        UpdateLayout();
+        Visibility = Visibility.Hidden;
+    }
+
+    /// <summary>
+    /// WPF's plain Activate() calls SetForegroundWindow internally, but Windows
+    /// only honors that call unconditionally for the process that currently
+    /// "owns" the input focus - a background process (which is exactly what we
+    /// are: our own message-only hotkey window received WM_HOTKEY, not this
+    /// window) can have that request silently ignored, especially while a
+    /// browser or File Explorer - both of which do their own input-focus/IME
+    /// juggling - holds the foreground. AttachThreadInput temporarily merges
+    /// our thread's input state with the current foreground thread's, which is
+    /// the standard, documented way to make SetForegroundWindow succeed
+    /// unconditionally regardless of who currently owns focus.
+    /// </summary>
+    private void ForceForeground()
+    {
+        try
+        {
+            var hwnd = new WindowInteropHelper(this).EnsureHandle();
+            var foregroundHwnd = GetForegroundWindow();
+            var foregroundThreadId = GetWindowThreadProcessId(foregroundHwnd, IntPtr.Zero);
+            var thisThreadId = GetCurrentThreadId();
+
+            var attached = foregroundThreadId != 0 && foregroundThreadId != thisThreadId
+                && AttachThreadInput(thisThreadId, foregroundThreadId, true);
+            try
+            {
+                Activate();
+                SetForegroundWindow(hwnd);
+
+                // Belt-and-braces: some windows (certain browser/Explorer surfaces)
+                // sit in their own topmost band that a plain Activate()/
+                // SetForegroundWindow doesn't outrank. Toggling Topmost off/on
+                // re-asserts our place at the very front of the z-order.
+                Topmost = false;
+                Topmost = true;
+            }
+            finally
+            {
+                if (attached)
+                    AttachThreadInput(thisThreadId, foregroundThreadId, false);
+            }
+        }
+        catch (Exception ex)
+        {
+            LogService.Error("ForceForeground failed; falling back to plain Activate().", ex);
+            Activate();
+        }
     }
 
     private double ComputeGlowMargin() => ThemeService.ComputeGlowMargin(_themeService.Current);
@@ -175,7 +272,10 @@ public partial class MainWindow : Window
         ScaleTransform.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleYProperty, scaleAnim);
         TranslateTransform.BeginAnimation(System.Windows.Media.TranslateTransform.YProperty, translateAnim);
 
-        Activate();
+        ForceForeground();
+        // Focus is (re)asserted from the Activated handler wired up in the
+        // constructor - see the comment there for why an immediate synchronous
+        // Keyboard.Focus() call here isn't reliable on the very first show.
         Keyboard.Focus(SearchBox);
 
         StartAmbientAnimation();

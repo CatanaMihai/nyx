@@ -2,7 +2,15 @@
 
 A fast, keyboard-first app launcher for Windows — press a hotkey, start typing, hit Enter. Inspired by Spotlight/Alfred/PowerToys Run, built from scratch in C#/.NET 8/WPF, with a full visual theming system underneath.
 
-<!-- ![Nyx main search bar](docs/screenshots/main.png) -->
+<p align="center">
+  <img src="docs/screenshots/main-bar-default.png" alt="Nyx main search bar, default theme" width="46%">
+  <img src="docs/screenshots/main-bar-cyberpunk.png" alt="Nyx main search bar, Cyberpunk theme" width="46%">
+</p>
+<p align="center"><em>Same search bar, two themes — Midnight Cyan (default) and Cyberpunk.</em></p>
+
+<p align="center">
+  <img src="docs/screenshots/search-result-blender.png" alt="Nyx returning a fuzzy search result" width="70%">
+</p>
 
 ## Features
 
@@ -16,7 +24,10 @@ A fast, keyboard-first app launcher for Windows — press a hotkey, start typing
 - **Rebindable shortcuts** for both the search hotkey and the Settings hotkey (`Ctrl+,` by default).
 - **Runs quietly in the tray** — single background instance, no admin rights required.
 
-<!-- ![Nyx settings — theme picker](docs/screenshots/settings.png) -->
+<p align="center">
+  <img src="docs/screenshots/appearance-colors.png" alt="Nyx settings — Appearance tab, custom colors" width="46%">
+  <img src="docs/screenshots/animations-tab.png" alt="Nyx settings — Animations tab" width="46%">
+</p>
 
 ## Install
 
